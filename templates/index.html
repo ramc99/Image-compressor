@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ImageShrink — Image Compressor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <h1>ImageShrink</h1>
+        </div>
+        <p class="tagline">Compress, resize &amp; enhance JPG and PNG images — free and private.</p>
+    </header>
+
+    <main>
+
+        <!-- ── Upload Section ─────────────────────────────────── -->
+        <section id="uploadSection">
+            <div class="card upload-card">
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-content">
+                        <div class="drop-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <h2>Drop your image here</h2>
+                        <p>or <span class="browse-link" id="browseLink">browse files</span></p>
+                        <p class="file-hint">Supports JPG, JPEG, PNG &nbsp;·&nbsp; Max 25 MB</p>
+                    </div>
+                    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" />
+                </div>
+
+                <div class="selected-file hidden" id="selectedFile">
+                    <div class="file-row">
+                        <img id="thumbImg" src="" alt="preview" />
+                        <div class="file-meta">
+                            <span class="file-name" id="fileName"></span>
+                            <span class="file-size" id="fileSize"></span>
+                        </div>
+                        <button class="remove-btn" id="removeBtn" aria-label="Remove file">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary compress-btn" id="compressBtn" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    Compress Image
+                </button>
+            </div>
+        </section>
+
+        <!-- ── Loading Section ────────────────────────────────── -->
+        <section id="loadingSection" class="hidden">
+            <div class="card loading-card">
+                <div class="spinner"></div>
+                <p class="loading-text" id="loadingText">Uploading…</p>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Results Section ────────────────────────────────── -->
+        <section id="resultsSection" class="hidden">
+
+            <!-- Stats bar -->
+            <div class="card stats-card">
+                <div class="stat">
+                    <span class="stat-label">Original</span>
+                    <span class="stat-value" id="statOriginal">—</span>
+                    <span class="stat-dim" id="statOrigDim"></span>
+                </div>
+                <div class="stat-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Output</span>
+                    <span class="stat-value accent" id="statCompressed">—</span>
+                    <span class="stat-dim" id="statOutDim"></span>
+                </div>
+                <div class="stat-badge" id="statBadge">—</div>
+            </div>
+
+            <!-- Two-column body -->
+            <div class="results-body">
+
+                <!-- Controls panel -->
+                <div class="card controls-panel" id="controlsPanel">
+                    <div class="cp-header">
+                        <span class="cp-title">Settings</span>
+                        <button class="reset-link" id="resetControls">Reset</button>
+                    </div>
+
+                    <!-- Quality -->
+                    <div class="ctrl-group">
+                        <div class="ctrl-row">
+                            <label class="ctrl-label">Quality</label>
+                            <span class="ctrl-val" id="qualityVal">72</span>
+                        </div>
+                        <input type="range" class="slider" id="quality" min="1" max="100" value="72" step="1" />
+                        <div class="slider-ends"><span>Low</span><span>High</span></div>
+                    </div>
+
+                    <!-- Output format -->
+                    <div class="ctrl-group">
+                        <label class="ctrl-label">Output Format</label>
+                        <div class="btn-group" id="formatPicker">
+                            <button class="fmt-btn active" data-fmt="jpg">JPG</button>
+                            <button class="fmt-btn" data-fmt="png">PNG</button>
+                            <button class="fmt-btn" data-fmt="webp">WEBP</button>
+                        </div>
+                    </div>
+
+                    <!-- Resize -->
+                    <div class="ctrl-group">
+                        <label class="ctrl-label">Resize</label>
+                        <div class="radio-row">
+                            <label class="radio-opt">
+                                <input type="radio" name="resizeMode" value="none" checked /> None
+                            </label>
+                            <label class="radio-opt">
+                                <input type="radio" name="resizeMode" value="percentage" /> Percentage
+                            </label>
+                            <label class="radio-opt">
+                                <input type="radio" name="resizeMode" value="custom" /> Custom
+                            </label>
+                        </div>
+
+                        <div id="resizePctPanel" class="sub-panel hidden">
+                            <div class="ctrl-row" style="margin-bottom:6px">
+                                <span class="ctrl-label-sm">Scale</span>
+                                <span class="ctrl-val" id="resizePctVal">100%</span>
+                            </div>
+                            <input type="range" class="slider" id="resizePctSlider" min="10" max="200" value="100" step="5" />
+                            <div class="slider-ends"><span>10%</span><span>200%</span></div>
+                        </div>
+
+                        <div id="resizeCustomPanel" class="sub-panel hidden">
+                            <div class="dim-row">
+                                <div class="dim-field">
+                                    <label class="dim-label">W (px)</label>
+                                    <input type="number" class="dim-input" id="resizeW" placeholder="—" min="1" max="20000" />
+                                </div>
+                                <button class="lock-btn" id="lockBtn" title="Lock aspect ratio">
+                                    <svg id="lockIcon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    </svg>
+                                </button>
+                                <div class="dim-field">
+                                    <label class="dim-label">H (px)</label>
+                                    <input type="number" class="dim-input" id="resizeH" placeholder="—" min="1" max="20000" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="ctrl-divider">Image Adjustments</div>
+
+                    <!-- Brightness -->
+                    <div class="ctrl-group">
+                        <div class="ctrl-row">
+                            <label class="ctrl-label">Brightness</label>
+                            <span class="ctrl-val" id="brightnessVal">1.0</span>
+                        </div>
+                        <input type="range" class="slider" id="brightness" min="0.1" max="3" value="1" step="0.05" />
+                    </div>
+
+                    <!-- Contrast -->
+                    <div class="ctrl-group">
+                        <div class="ctrl-row">
+                            <label class="ctrl-label">Contrast</label>
+                            <span class="ctrl-val" id="contrastVal">1.0</span>
+                        </div>
+                        <input type="range" class="slider" id="contrast" min="0.1" max="3" value="1" step="0.05" />
+                    </div>
+
+                    <!-- Sharpness -->
+                    <div class="ctrl-group">
+                        <div class="ctrl-row">
+                            <label class="ctrl-label">Sharpness</label>
+                            <span class="ctrl-val" id="sharpnessVal">1.0</span>
+                        </div>
+                        <input type="range" class="slider" id="sharpness" min="0" max="3" value="1" step="0.05" />
+                    </div>
+
+                    <!-- Blur -->
+                    <div class="ctrl-group">
+                        <div class="ctrl-row">
+                            <label class="ctrl-label">Blur</label>
+                            <span class="ctrl-val" id="blurVal">0</span>
+                        </div>
+                        <input type="range" class="slider" id="blur" min="0" max="20" value="0" step="0.5" />
+                        <div class="slider-ends"><span>None</span><span>Max</span></div>
+                    </div>
+
+                    <button class="btn btn-primary apply-btn" id="applyBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Apply Settings
+                    </button>
+                    <p class="auto-hint" id="autoHint">Auto-applies 800 ms after changes</p>
+                </div>
+
+                <!-- Right side: comparison + actions -->
+                <div class="results-right">
+                    <div class="comparison-grid">
+                        <div class="card comparison-card">
+                            <div class="img-label">Before</div>
+                            <div class="img-wrap">
+                                <img id="imgOriginal" src="" alt="Original" />
+                            </div>
+                            <div class="img-footer" id="footOriginal">—</div>
+                        </div>
+                        <div class="card comparison-card">
+                            <div class="img-label compressed">After</div>
+                            <div class="img-wrap" style="position:relative">
+                                <img id="imgCompressed" src="" alt="Compressed" />
+                                <div class="preview-overlay hidden" id="previewOverlay">
+                                    <div class="mini-spinner"></div>
+                                </div>
+                            </div>
+                            <div class="img-footer" id="footCompressed">—</div>
+                        </div>
+                    </div>
+
+                    <div class="result-actions">
+                        <a id="downloadBtn" href="#" class="btn btn-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download
+                        </a>
+                        <button id="newBtn" class="btn btn-outline">
+                            Compress Another
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- .results-body -->
+        </section>
+
+    </main>
+</div>
+
+<!-- ── Error Toast ─────────────────────────────────────────── -->
+<div class="toast" id="errorToast">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    </svg>
+    <span id="toastMsg"></span>
+    <button class="toast-close" id="toastClose" aria-label="Dismiss">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
