@@ -136,6 +136,60 @@ All limits are set as constants at the top of `app.py`:
 
 ---
 
+## Built with Claude Code
+
+This project was generated entirely using [Claude Code](https://claude.ai/code) (Anthropic) via two prompts.
+
+### Prompt 1 — Initial app
+
+> Build a clean and visually appealing Flask web application for image size reduction.
+>
+> **Requirements:**
+>
+> 1. **Tech stack:** Backend: Python Flask · Frontend: HTML, CSS (modern styling, centered layout, responsive design)
+>
+> 2. **Features:**
+>    - Upload an image file (max size: 25MB)
+>    - Accept formats: JPG, JPEG, PNG
+>    - After upload, compress the image automatically
+>    - Reduce file size using efficient compression (adjust quality or optimize)
+>    - Show: Original file size · Compressed file size · Preview of original and compressed images
+>
+> 3. **Functionality:**
+>    - Use Python image processing library like Pillow
+>    - Save compressed image temporarily
+>    - Provide a download button for the compressed image
+>
+> 4. **UI Requirements:**
+>    - Clean card layout
+>    - Drag-and-drop upload area
+>    - Progress/loading indicator
+>    - Before vs After comparison section
+>
+> 5. **Constraints:**
+>    - Reject files larger than 25MB
+>    - Handle invalid file types gracefully
+
+### Prompt 2 — Advanced controls
+
+> Enhance the existing Flask image compression app with advanced image controls.
+>
+> **Add the following features:**
+>
+> 1. **User Controls:** Compression quality slider (1–100) · Resize option (percentage or custom width/height) · Output format selection (JPG, PNG, WEBP)
+>
+> 2. **Image Adjustments:** Brightness control · Contrast control · Sharpness control · Blur effect (Gaussian blur slider)
+>
+> 3. **Preview:** Real-time preview (or quick refresh preview after applying settings)
+>
+> 4. **Backend:** Use Pillow for all transformations · Apply transformations before saving compressed image
+>
+> 5. **UI Enhancements:** Sliders with labels · Toggle for advanced settings · Side-by-side comparison
+>
+> 6. **Maintain:** 25MB upload limit · Error handling · Clean UX
+
+---
+
 ## License
 
 MIT — do whatever you like with it.
